@@ -6,14 +6,14 @@ const findUserByEmail = async (email) => {
 };
 
 const findUserById = async (id) => {
-  const [rows] = await pool.query('SELECT id, name, email, created_at FROM users WHERE id = ?', [id]);
+  const [rows] = await pool.query('SELECT id, name, email, role, created_at FROM users WHERE id = ?', [id]);
   return rows[0];
 };
 
-const createUser = async (name, email, hashedPassword) => {
+const createUser = async (name, email, hashedPassword, role = 'user') => {
   const [result] = await pool.query(
-    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-    [name, email, hashedPassword]
+    'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+    [name, email, hashedPassword, role]
   );
   return result.insertId;
 };

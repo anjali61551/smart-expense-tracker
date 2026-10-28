@@ -1,8 +1,13 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  LayoutDashboard, ArrowLeftRight, PiggyBank,
-  BarChart2, LogOut, User
+  LayoutDashboard,
+  ArrowLeftRight,
+  PiggyBank,
+  BarChart2,
+  LogOut,
+  User,
+  ShieldCheck
 } from 'lucide-react';
 
 const navLinks = [
@@ -20,6 +25,8 @@ const Sidebar = () => {
     logout();
     navigate('/login');
   };
+
+  const isAdmin = user?.role === 'admin';
 
   return (
     <aside className="w-64 min-h-screen bg-indigo-700 text-white flex flex-col shadow-xl">
@@ -46,15 +53,34 @@ const Sidebar = () => {
             {label}
           </NavLink>
         ))}
+
+        {isAdmin && (
+          <div className="pt-4 mt-4 border-t border-indigo-600">
+            <Link
+              to="/admin"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg bg-indigo-900/60 text-indigo-100 hover:bg-indigo-900 hover:text-white transition-all text-sm font-semibold border border-indigo-500/30 shadow-inner"
+            >
+              <ShieldCheck size={18} className="text-emerald-400" />
+              Admin Portal
+            </Link>
+          </div>
+        )}
       </nav>
 
       <div className="p-4 border-t border-indigo-600">
         <div className="flex items-center gap-3 mb-3 px-2">
-          <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
-            <User size={16} />
+          <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs">
+            {user?.name?.[0]?.toUpperCase() || <User size={16} />}
           </div>
-          <div>
-            <p className="text-sm font-medium">{user?.name}</p>
+          <div className="overflow-hidden">
+            <p className="text-sm font-medium truncate flex items-center gap-1.5">
+              {user?.name}
+              {isAdmin && (
+                <span className="text-[10px] bg-indigo-500/40 text-indigo-200 px-1.5 py-0.2 rounded font-normal">
+                  Admin
+                </span>
+              )}
+            </p>
             <p className="text-xs text-indigo-300 truncate">{user?.email}</p>
           </div>
         </div>

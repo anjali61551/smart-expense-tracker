@@ -5,7 +5,22 @@ import { Plus, Pencil, Trash2, X, Search, Filter } from 'lucide-react';
 
 const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Bills', 'Health', 'Entertainment', 'Education', 'Salary', 'Freelance', 'Investment', 'Other'];
 
-const emptyForm = { type: 'expense', amount: '', category: '', description: '', date: new Date().toISOString().split('T')[0] };
+const formatDate = (d) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getTodayString = () => formatDate(new Date());
+
+const getOneYearAgoString = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 1);
+  return formatDate(d);
+};
+
+const emptyForm = { type: 'expense', amount: '', category: '', description: '', date: getTodayString() };
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -27,7 +42,7 @@ const Transactions = () => {
 
   useEffect(() => { fetchTransactions(); }, [filters]);
 
-  const openAdd = () => { setForm(emptyForm); setEditId(null); setShowModal(true); };
+  const openAdd = () => { setForm({ ...emptyForm, date: getTodayString() }); setEditId(null); setShowModal(true); };
   const openEdit = (t) => {
     setForm({ type: t.type, amount: t.amount, category: t.category, description: t.description || '', date: t.date });
     setEditId(t.id);
@@ -36,6 +51,16 @@ const Transactions = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const today = getTodayString();
+    const oneYearAgo = getOneYearAgoString();
+    if (form.date > today) {
+      toast.error("Future transaction dates are not allowed.");
+      return;
+    }
+    if (form.date < oneYearAgo) {
+      toast.error("Past transactions can only be recorded up to 1 year back from current date.");
+      return;
+    }
     setSaving(true);
     try {
       if (editId) {
@@ -211,9 +236,19 @@ const Transactions = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                <input type="date" required value={form.date} onChange={e => setForm({...form, date: e.target.value})}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  Date <span className="text-slate-400 font-normal">(Within last 1 year)</span>
+                </label>
+                <input
+                  type="date"
+                  required
+                  min={getOneYearAgoString()}
+                  max={getTodayString()}
+                  value={form.date}
+                  onChange={e => setForm({...form, date: e.target.value})}
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-700"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">Allowed: Today and past dates up to 1 year ago (Future dates disabled).</p>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Description (optional)</label>

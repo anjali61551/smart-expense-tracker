@@ -2,15 +2,37 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
+
+const ALLOWED_EMAIL_DOMAINS = [
+  'gmail.com',
+  'yahoo.com',
+  'hotmail.com',
+  'outlook.com',
+  'icloud.com',
+  'live.com',
+  'aol.com',
+  'zoho.com',
+  'mail.com',
+  'proton.me',
+  'protonmail.com'
+];
 
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const emailParts = form.email.trim().toLowerCase().split('@');
+    if (emailParts.length !== 2 || !ALLOWED_EMAIL_DOMAINS.includes(emailParts[1])) {
+      toast.error('Only recognized email providers (@gmail.com, @hotmail.com, @yahoo.com, @outlook.com) are accepted.');
+      return;
+    }
+
     setLoading(true);
     try {
       await register(form.name, form.email, form.password);
@@ -50,20 +72,33 @@ const Register = () => {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="you@example.com"
+              placeholder="you@gmail.com"
             />
+            <p className="text-[11px] text-slate-400 mt-1">
+              Accepted providers: @gmail.com, @hotmail.com, @yahoo.com, @outlook.com, @icloud.com
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Min 6 characters"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={6}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className="w-full border border-slate-300 rounded-lg px-4 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Min 6 characters"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"

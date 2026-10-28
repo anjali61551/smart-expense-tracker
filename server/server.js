@@ -8,6 +8,7 @@ const transactionRoutes = require('./routes/transactions');
 const dashboardRoutes = require('./routes/dashboard');
 const budgetRoutes = require('./routes/budgets');
 const exportRoutes = require('./routes/export');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
