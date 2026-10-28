@@ -29,7 +29,7 @@ const Register = () => {
     e.preventDefault();
     const emailParts = form.email.trim().toLowerCase().split('@');
     if (emailParts.length !== 2 || !ALLOWED_EMAIL_DOMAINS.includes(emailParts[1])) {
-      toast.error('Only recognized email providers (@gmail.com, @hotmail.com, @yahoo.com, @outlook.com) are accepted.');
+      toast.error('Invalid email');
       return;
     }
 
@@ -74,9 +74,6 @@ const Register = () => {
               className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="you@gmail.com"
             />
-            <p className="text-[11px] text-slate-400 mt-1">
-              Accepted providers: @gmail.com, @hotmail.com, @yahoo.com, @outlook.com, @icloud.com
-            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>

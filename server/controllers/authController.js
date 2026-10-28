@@ -26,15 +26,8 @@ const register = async (req, res) => {
   // Validate email format and domain
   const normalizedEmail = String(email).trim().toLowerCase();
   const emailParts = normalizedEmail.split('@');
-  if (emailParts.length !== 2 || !emailParts[0] || !emailParts[1]) {
-    return res.status(400).json({ message: 'Please provide a valid email address.' });
-  }
-
-  const domain = emailParts[1];
-  if (!ALLOWED_EMAIL_DOMAINS.includes(domain)) {
-    return res.status(400).json({
-      message: `Invalid email domain. Only trusted providers (@gmail.com, @hotmail.com, @yahoo.com, @outlook.com, @icloud.com) are accepted.`
-    });
+  if (emailParts.length !== 2 || !emailParts[0] || !emailParts[1] || !ALLOWED_EMAIL_DOMAINS.includes(emailParts[1])) {
+    return res.status(400).json({ message: 'Invalid email' });
   }
 
   // Check if registration is allowed in system settings
